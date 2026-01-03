@@ -1,5 +1,5 @@
 export const config = {
-  runtime: "nodejs", // IMPORTANT: not edge
+  runtime: "nodejs",
 };
 
 export default async function handler(req, res) {
@@ -8,17 +8,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // 🔑 Read HF key from Vercel environment
   const HF_API_KEY = process.env.HF_API_KEY;
-
   if (!HF_API_KEY) {
-    return res.status(500).json({ error: "HF_API_KEY missing" });
+    return res.status(500).json({ error: "HF_API_KEY missing in environment variables" });
   }
 
   try {
-    // ✅ Forward request body directly (image + prompt)
+    // ✅ NEW ENDPOINT - HuggingFace Router API
     const hfResponse = await fetch(
-      "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-11B-Vision-Instruct",
+      "https://router.huggingface.co/models/meta-llama/Llama-3.2-11B-Vision-Instruct",
       {
         method: "POST",
         headers: {
@@ -29,10 +27,9 @@ export default async function handler(req, res) {
       }
     );
 
-    // ❗ Handle HuggingFace non-200 responses properly
     if (!hfResponse.ok) {
       const errorText = await hfResponse.text();
-      console.error("HuggingFace error:", errorText);
+      console.error("HuggingFace Router error:", errorText);
       return res.status(hfResponse.status).json({
         error: "HuggingFace API request failed",
         details: errorText,
@@ -40,11 +37,12 @@ export default async function handler(req, res) {
     }
 
     const data = await hfResponse.json();
-
-    // ✅ Always return JSON
     return res.status(200).json(data);
   } catch (err) {
-    console.error("Analyze API error:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("Backend analyze error:", err);
+    return res.status(500).json({ 
+      error: "Internal server error",
+      details: err.message 
+    });
   }
 }
