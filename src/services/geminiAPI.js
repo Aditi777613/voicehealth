@@ -1,15 +1,15 @@
 export async function analyzePrescription(imageBase64, language) {
   try {
-    // Call YOUR Vercel backend API instead of HuggingFace directly
+    // Call backend API
     const response = await fetch("/api/analyze", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        inputs: {
-          image: imageBase64,
-          text: `Analyze this medical prescription image and extract all information. Respond in ${getLanguageName(language)} language.
+        imageBase64,
+        language: getLanguageName(language),
+        prompt: `Analyze this medical prescription image and extract all information. Respond in ${getLanguageName(language)} language.
 
 IMPORTANT: Return ONLY a valid JSON object with this exact structure (no extra text, no markdown):
 
@@ -43,11 +43,6 @@ Rules:
 5. If prescription is unclear, mention it in warnings
 6. Keep language simple and easy to understand
 7. Return pure JSON only - no markdown, no extra text`
-        },
-        parameters: {
-          max_new_tokens: 2000,
-          temperature: 0.3
-        }
       })
     });
 
@@ -57,35 +52,8 @@ Rules:
       throw new Error(`Backend API request failed: ${response.status}. ${errorData.error || ''}`);
     }
 
-    const result = await response.json();
-    console.log('Backend API Response:', result);
-    
-    let content = '';
-    
-    // HuggingFace returns different formats
-    if (Array.isArray(result)) {
-      content = result[0].generated_text || result[0];
-    } else if (result.generated_text) {
-      content = result.generated_text;
-    } else if (typeof result === 'string') {
-      content = result;
-    } else {
-      throw new Error('Unexpected API response format');
-    }
-    
-    // Parse JSON from response
-    let jsonText = content.trim();
-    
-    // Remove markdown code blocks if present
-    jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    
-    // Try to find JSON in the response
-    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      jsonText = jsonMatch[0];
-    }
-    
-    const analysis = JSON.parse(jsonText);
+    const analysis = await response.json();
+    console.log('Backend API Response:', analysis);
     
     // Validate the response has required fields
     if (!analysis.summary || !analysis.medicines || !Array.isArray(analysis.medicines)) {
