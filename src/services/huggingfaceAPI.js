@@ -1,16 +1,15 @@
 export async function analyzePrescription(imageBase64, language) {
-
   try {
-    // Use Hugging Face Inference API with Llama 3.2 Vision
+    // Call YOUR Vercel backend API instead of HuggingFace directly
     const response = await fetch("/api/analyze", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-    imageBase64,
-    language,
-    prompt: `Analyze this medical prescription image and extract all information. Respond in ${getLanguageName(language)} language.
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: {
+          image: imageBase64,
+          text: `Analyze this medical prescription image and extract all information. Respond in ${getLanguageName(language)} language.
 
 IMPORTANT: Return ONLY a valid JSON object with this exact structure (no extra text, no markdown):
 
@@ -44,18 +43,22 @@ Rules:
 5. If prescription is unclear, mention it in warnings
 6. Keep language simple and easy to understand
 7. Return pure JSON only - no markdown, no extra text`
-        })
-      }
-    );
+        },
+        parameters: {
+          max_new_tokens: 2000,
+          temperature: 0.3
+        }
+      })
+    });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('HuggingFace API Error:', errorText);
-      throw new Error(`HuggingFace API request failed: ${response.status}. Error: ${errorText}`);
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Backend API Error:', errorData);
+      throw new Error(`Backend API request failed: ${response.status}. ${errorData.error || ''}`);
     }
 
     const result = await response.json();
-    console.log('HuggingFace API Response:', result);
+    console.log('Backend API Response:', result);
     
     let content = '';
     
@@ -64,6 +67,8 @@ Rules:
       content = result[0].generated_text || result[0];
     } else if (result.generated_text) {
       content = result.generated_text;
+    } else if (typeof result === 'string') {
+      content = result;
     } else {
       throw new Error('Unexpected API response format');
     }
