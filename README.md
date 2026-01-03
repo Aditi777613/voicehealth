@@ -117,4 +117,6 @@ Built with ❤️ for healthcare accessibility
 
 ---
 
-**Note**: This app is for informational purposes only and should not replace professional medical advice.
+**Note**: 
+- This app is for informational purposes only and should not replace professional medical advice.
+- Voice output quality is best on mobile devices due to native language TTS support.
