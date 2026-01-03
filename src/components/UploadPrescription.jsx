@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Upload, Camera, Loader2 } from 'lucide-react';
-import { analyzePrescription } from '../services/huggingfaceAPI';
+import { analyzePrescription } from '../services/geminiAPI';
 import { compressImage } from '../utils/imageCompression';
 
 function UploadPrescription({ onAnalysisComplete, selectedLanguage, loading, setLoading }) {
