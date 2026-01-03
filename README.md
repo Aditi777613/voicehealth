@@ -5,7 +5,7 @@ VoiceHealth is a mobile-first PWA that helps Indians understand medical prescrip
 
 ## Features
 - 📸 Upload prescription images or take photos
-- 🤖 AI-powered prescription analysis using Claude
+- 🤖 AI-powered prescription analysis using Google Gemini
 - 🌍 Multi-language support (English, Hindi, Punjabi, Bengali, Telugu, Marathi, Tamil, Gujarati)
 - 🔊 Voice output for illiterate users
 - 💊 Detailed medicine information (dosage, timing, side effects)
@@ -18,7 +18,7 @@ VoiceHealth is a mobile-first PWA that helps Indians understand medical prescrip
 - React 18
 - Vite
 - Tailwind CSS
-- Claude Sonnet 4 API
+- Google Gemini 2.5 Flash (Generative Language API)
 - Web Speech API
 - Service Workers (PWA)
 - Local Storage
@@ -27,7 +27,7 @@ VoiceHealth is a mobile-first PWA that helps Indians understand medical prescrip
 
 ### Prerequisites
 - Node.js 18+
-- Hugging Face API key
+- Gemini API key
 
 ### Steps
 1. Clone the repository
@@ -46,9 +46,9 @@ npm install
 cp .env.example .env
 ```
 
-4. Add your Hugging Face API key to `.env`
+4. Add your Gemini API key to `.env`
 ```
-VITE_HF_API_KEY=your_api_key_here
+GEMINI_API_KEY=your_api_key_here
 ```
 
 5. Run development server
@@ -87,7 +87,7 @@ voicehealth/
 ```
 
 ## API Usage
-This app uses Claude Sonnet 4 via the Hugging Face API. Make sure you have sufficient credits in your Hugging Face account.
+This app uses Google Gemini (Gemini 2.5 Flash) via Google’s Generative Language API (free tier).
 
 ## Browser Support
 - Chrome/Edge 90+
